@@ -255,8 +255,11 @@ class PathTracer:
                     for s in range(samples):
                         yield (ray, 0, scene, None)
 
-        with Pool(processes=4) as pool:
-            colors = pool.imap(path_trace_from_tuple, args_generator(), samples * 75)
+        process_count = 4;
+        with Pool(processes=process_count) as pool:
+            colors = pool.imap(path_trace_from_tuple,
+                               args_generator(),
+                               samples * camera.resolution[0])
             for j in range(camera.resolution[1]):
                 for i in range(camera.resolution[0]):
                     for s in range(samples):
