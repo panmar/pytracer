@@ -25,8 +25,8 @@ def main():
              Triangle(Vec3(-10,-2,10), Vec3(-10,6,10), Vec3(10,6,10), Material(0,1/pi)),
     )
 
-    path_tracer = PathTracer()
-    img = path_tracer.start(camera, scene, 32)
+    ptracer = PathTracer()
+    img = ptracer.render(camera, scene, 32)
     save_img("result.ppm", img)
 
 if __name__ == '__main__':

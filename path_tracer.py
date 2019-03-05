@@ -199,53 +199,13 @@ def random_unit_vec_in_hemisphere(normal : Vec3) -> Vec3:
     else:
         return -result
 
-def path_trace(ray : Ray,
-               depth : int,
-               items : Tuple,
-               from_item = None) -> int:
-    max_depth = 5
-    if depth >= max_depth:
-        return 0
-
-    closest_hit = Ray.IntersectionResult(success=False,
-                                         distance=999999999.9,
-                                         intersection=None,
-                                         normal=None,
-                                         item=None)
-    for item in items:
-        if (from_item is not None) and (item is from_item):
-            continue
-        hit = ray.intersect(item)
-        if hit.success and (closest_hit.distance > hit.distance):
-            closest_hit = hit
-
-    if not closest_hit.success:
-        return 0
-
-    new_ray_dir = random_unit_vec_in_hemisphere(closest_hit.normal)
-    new_ray = Ray(closest_hit.intersection, new_ray_dir)
-
-    cos_theta = new_ray.dir.dot(closest_hit.normal)
-    reflectance = closest_hit.item.material.reflectance
-    emittance = closest_hit.item.material.emittance
-    if reflectance < 0.01:
-        return emittance
-    color_incoming = path_trace(new_ray, depth + 1, items, closest_hit.item)
-    final_color = emittance + (reflectance * color_incoming * cos_theta * 2.0)
-    return final_color
-
-def path_trace_from_tuple(args : Tuple[Ray,
-                                       int,
-                                       Tuple[Triangle, Sphere],
-                                       Optional[Union[Triangle, Sphere]]]) -> int:
-    return path_trace(*args)
-
 class PathTracer:
-    def start(self, camera : Camera,
+    def render(self,
+              camera : Camera,
               scene : Tuple[Triangle, Sphere],
               samples: int) -> List[List[int]]:
-        img = [[0 for x in range(camera.resolution[0])] for x in range(camera.resolution[1])]
         random.seed(datetime.now())
+        img = [[0 for x in range(camera.resolution[0])] for x in range(camera.resolution[1])]
 
         def args_provider():
             nonlocal samples, camera, scene
@@ -257,7 +217,7 @@ class PathTracer:
 
         process_count = 4;
         with Pool(processes=process_count) as pool:
-            colors = pool.imap(path_trace_from_tuple,
+            colors = pool.imap(self._path_trace_from_tuple,
                                args_provider(),
                                samples * camera.resolution[0])
             for j in range(camera.resolution[1]):
@@ -270,3 +230,45 @@ class PathTracer:
                 img[j][i] = max(0, min(int(img[j][i] / samples), 255))
 
         return img
+
+    def path_trace(self,
+                   ray : Ray,
+                   depth : int,
+                   items : Tuple[Triangle, Sphere],
+                   from_item = None) -> int:
+        max_depth = 5
+        if depth >= max_depth:
+            return 0
+
+        closest_hit = Ray.IntersectionResult(success=False,
+                                             distance=999999999.9,
+                                             intersection=None,
+                                             normal=None,
+                                             item=None)
+        for item in items:
+            if (from_item is not None) and (item is from_item):
+                continue
+            hit = ray.intersect(item)
+            if hit.success and (closest_hit.distance > hit.distance):
+                closest_hit = hit
+
+        if not closest_hit.success:
+            return 0
+
+        new_ray_dir = random_unit_vec_in_hemisphere(closest_hit.normal)
+        new_ray = Ray(closest_hit.intersection, new_ray_dir)
+
+        cos_theta = new_ray.dir.dot(closest_hit.normal)
+        reflectance = closest_hit.item.material.reflectance
+        emittance = closest_hit.item.material.emittance
+        if reflectance < 0.01:
+            return emittance
+        color_incoming = self.path_trace(new_ray, depth + 1, items, closest_hit.item)
+        final_color = emittance + (reflectance * color_incoming * cos_theta * 2.0)
+        return final_color
+
+    def _path_trace_from_tuple(self, args : Tuple[Ray,
+                                            int,
+                                            Tuple[Triangle, Sphere],
+                                            Optional[Union[Triangle, Sphere]]]) -> int:
+        return self.path_trace(*args)
