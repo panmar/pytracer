@@ -270,5 +270,4 @@ class PathTracer:
                                             int,
                                             Tuple[Triangle, Sphere],
                                             Optional[Union[Triangle, Sphere]]]) -> int:
-        random.seed()
         return self.path_trace(*args)
