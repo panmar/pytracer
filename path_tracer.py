@@ -6,7 +6,7 @@ import math
 from multiprocessing import Pool
 import random
 import time
-from typing import ClassVar, List, Optional, Tuple, Union
+from typing import ClassVar, List, NamedTuple, Optional, Tuple, Union
 
 
 @dataclass
@@ -79,14 +79,27 @@ class Triangle:
         self.normal = (self.a - self.b).cross(self.a - self.c).normalize()
 
 
+class IntersectionResult(NamedTuple):
+    success: bool
+    distance: float
+    intersection: Vec3
+    normal: Vec3
+    item: Optional[Union[Sphere, Triangle]]
+
+
+NoIntersect = IntersectionResult(
+    success=False,
+    distance=99_999_999_999_999.0,
+    intersection=Vec3.zero,
+    normal=Vec3.zero,
+    item=None,
+)
+
+
 @dataclass
 class Ray:
     origin: Vec3
     dir: Vec3
-
-    IntersectionResult = namedtuple(
-        "IntersectionResult", "success distance intersection normal item"
-    )
 
     def intersect(self, obj) -> IntersectionResult:
         if isinstance(obj, Sphere):
@@ -95,9 +108,7 @@ class Ray:
             return self._intersect_triangle(obj)
         else:
             assert (False, "Unsupported intersection type")
-            return Ray.IntersectionResult(
-                success=False, distance=0, intersection=None, normal=None, item=None
-            )
+            return NoIntersect
 
     def _intersect_sphere(self, sphere: Sphere) -> IntersectionResult:
         oc = self.origin - sphere.center
@@ -105,18 +116,15 @@ class Ray:
         b = 2.0 * oc.dot(self.dir)
         c = oc.dot(oc) - sphere.radius * sphere.radius
         discriminant = b * b - 4 * a * c
-        no_intersect = Ray.IntersectionResult(
-            success=False, distance=0, intersection=None, normal=None, item=None
-        )
         if discriminant < 0.0:
-            return no_intersect
+            return NoIntersect
         else:
             distance = (-b - math.sqrt(discriminant)) / (2.0 * a)
             if distance < 0.0:
-                return no_intersect
+                return NoIntersect
             intersection = self.origin + distance * self.dir
             normal = (intersection - sphere.center).normalize()
-            return Ray.IntersectionResult(
+            return IntersectionResult(
                 success=True,
                 distance=distance,
                 intersection=intersection,
@@ -127,9 +135,6 @@ class Ray:
     def _intersect_triangle(self, triangle: Triangle) -> IntersectionResult:
         """ Möller–Trumbore intersection """
 
-        no_intersect = Ray.IntersectionResult(
-            success=False, distance=0, intersection=None, normal=None, item=None
-        )
         epsilon = 0.000_001
         v0, v1, v2 = triangle.a, triangle.b, triangle.c
         edge1 = v1 - v0
@@ -137,20 +142,20 @@ class Ray:
         h = self.dir.cross(edge2)
         a = edge1.dot(h)
         if (a > -epsilon) and (a < epsilon):
-            return no_intersect
+            return NoIntersect
         f = 1.0 / a
         s = self.origin - v0
         u = f * s.dot(h)
         if (u < 0.0) or (u > 1.0):
-            return no_intersect
+            return NoIntersect
         q = s.cross(edge1)
         v = f * self.dir.dot(q)
         if (v < 0.0) or (u + v > 1.0):
-            return no_intersect
+            return NoIntersect
         distance = f * edge2.dot(q)
         if distance > epsilon:
             intersection = self.origin + self.dir * distance
-            return Ray.IntersectionResult(
+            return IntersectionResult(
                 success=True,
                 distance=distance,
                 intersection=intersection,
@@ -158,7 +163,7 @@ class Ray:
                 item=triangle,
             )
         else:
-            return no_intersect
+            return NoIntersect
 
 
 @dataclass
@@ -256,13 +261,7 @@ class PathTracer:
         if depth >= max_depth:
             return 0
 
-        closest_hit = Ray.IntersectionResult(
-            success=False,
-            distance=999_999_999.9,
-            intersection=None,
-            normal=None,
-            item=None,
-        )
+        closest_hit = NoIntersect
         for item in items:
             if (from_item is not None) and (item is from_item):
                 continue
@@ -277,13 +276,14 @@ class PathTracer:
         new_ray = Ray(closest_hit.intersection, new_ray_dir)
 
         cos_theta = new_ray.dir.dot(closest_hit.normal)
+        assert closest_hit.item is not None
         reflectance = closest_hit.item.material.reflectance
         emittance = closest_hit.item.material.emittance
         if reflectance < 0.01:
-            return emittance
+            return int(emittance)
         color_incoming = self.path_trace(new_ray, depth + 1, items, closest_hit.item)
         final_color = emittance + (reflectance * color_incoming * cos_theta * 2.0)
-        return final_color
+        return int(final_color)
 
     def _path_trace_from_tuple(
         self,
