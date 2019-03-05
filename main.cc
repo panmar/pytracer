@@ -210,23 +210,13 @@ inline int path_trace(const Ray& ray,
 
   auto closest_hit = Ray::no_intersect;
   for (auto&& object : scene) {
-    std::visit(overloaded {
-      [&ray, from_id, &closest_hit](const Sphere& s) {
-        if (from_id != s.id) {
-          auto hit = ray.intersect(s);
-          if (std::get<0>(hit) && (std::get<1>(closest_hit) > std::get<1>(hit))) {
-            closest_hit = hit;
-          }
+    std::visit([&ray, from_id, &closest_hit](auto&& arg){
+      if (from_id != arg.id) {
+        auto hit = ray.intersect(arg);
+        if (std::get<0>(hit) && (std::get<1>(closest_hit) > std::get<1>(hit))) {
+          closest_hit = hit;
         }
-      },
-      [&ray, from_id, &closest_hit](const Triangle& t) {
-        if (from_id != t.id) {
-          auto hit = ray.intersect(t);
-          if (std::get<0>(hit) && (std::get<1>(closest_hit) > std::get<1>(hit))) {
-            closest_hit = hit;
-          }
-        }
-      },
+      }
     }, object);
   }
 
@@ -290,7 +280,7 @@ int main() {
 
   vector<vector<int>> img(camera.resolution[0], vector<int>(camera.resolution[1]));
 
-  int samples = 512;
+  int samples = 64;
   std::mutex lock;
   vector<std::thread> threads;
   for (int j = 0; j < camera.resolution[1]; ++j) {
