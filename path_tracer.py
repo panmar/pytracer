@@ -141,16 +141,16 @@ class Ray:
         edge2 = v2 - v0
         h = self.dir.cross(edge2)
         a = edge1.dot(h)
-        if (a > -epsilon) and (a < epsilon):
+        if a > -epsilon and a < epsilon:
             return NoIntersect
         f = 1.0 / a
         s = self.origin - v0
         u = f * s.dot(h)
-        if (u < 0.0) or (u > 1.0):
+        if u < 0.0 or u > 1.0:
             return NoIntersect
         q = s.cross(edge1)
         v = f * self.dir.dot(q)
-        if (v < 0.0) or (u + v > 1.0):
+        if v < 0.0 or u + v > 1.0:
             return NoIntersect
         distance = f * edge2.dot(q)
         if distance > epsilon:
@@ -258,15 +258,15 @@ class PathTracer:
         from_item: Optional[Union[Triangle, Sphere]] = None,
     ) -> int:
         max_depth = 5
-        if depth >= max_depth:
+        if depth > max_depth:
             return 0
 
         closest_hit = NoIntersect
         for item in items:
-            if (from_item is not None) and (item is from_item):
+            if from_item is not None and item is from_item:
                 continue
             hit = ray.intersect(item)
-            if hit.success and (closest_hit.distance > hit.distance):
+            if hit.success and closest_hit.distance > hit.distance:
                 closest_hit = hit
 
         if not closest_hit.success:
