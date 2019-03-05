@@ -181,8 +181,9 @@ class Camera:
 
     def generate_ray(self, i: int, j: int) -> Ray:
         ray_origin = self.position
+        aspect_ratio = self.resolution[1] / self.resolution[0]
         scale_left = -1.0 + 2.0 * i / self.resolution[0]
-        scale_up = -1.0 + 2.0 * j / self.resolution[1]
+        scale_up = (-1.0 + 2.0 * j / self.resolution[1]) * aspect_ratio
         ray_dir = self.dir + self.left * scale_left + self.up * scale_up
         return Ray(ray_origin, ray_dir.normalize())
 
