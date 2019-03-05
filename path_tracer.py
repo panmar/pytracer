@@ -204,7 +204,6 @@ class PathTracer:
               camera : Camera,
               scene : Tuple[Triangle, Sphere],
               samples: int) -> List[List[int]]:
-        random.seed(datetime.now())
         img = [[0 for x in range(camera.resolution[0])] for x in range(camera.resolution[1])]
 
         def args_provider():
@@ -235,7 +234,7 @@ class PathTracer:
                    ray : Ray,
                    depth : int,
                    items : Tuple[Triangle, Sphere],
-                   from_item = None) -> int:
+                   from_item : Optional[Union[Triangle, Sphere]] = None) -> int:
         max_depth = 5
         if depth >= max_depth:
             return 0
@@ -271,4 +270,5 @@ class PathTracer:
                                             int,
                                             Tuple[Triangle, Sphere],
                                             Optional[Union[Triangle, Sphere]]]) -> int:
+        random.seed()
         return self.path_trace(*args)
