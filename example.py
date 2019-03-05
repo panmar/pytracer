@@ -9,47 +9,25 @@ def main():
         up=Vec3.up,
         resolution=(300, 300),
     )
+
+    mat = Material(0, 1 / pi)
     scene = (
         Sphere(Vec3(-4.0, 0, 0), 2.0, Material(0, 1.0 / pi)),
         Sphere(Vec3(0, -1.0, 3), 1.0, Material(0, 1.0 / pi)),
         Sphere(Vec3(4.0, 1, 0.0), 3.0, Material(0, 1.0 / pi)),
         Sphere(Vec3(0, 5, 0), 0.75, Material(19550, 0.0)),
-        Triangle(
-            Vec3(-10, -2, -10), Vec3(10, -2, 10), Vec3(10, -2, -10), Material(0, 1 / pi)
-        ),
-        Triangle(
-            Vec3(-10, -2, -10), Vec3(-10, -2, 10), Vec3(10, -2, 10), Material(0, 1 / pi)
-        ),
-        Triangle(
-            Vec3(-10, 6, -10), Vec3(10, 6, -10), Vec3(10, 6, 10), Material(0, 1 / pi)
-        ),
-        Triangle(
-            Vec3(-10, 6, -10), Vec3(10, 6, 10), Vec3(-10, 6, 10), Material(0, 1 / pi)
-        ),
-        Triangle(
-            Vec3(-10, -2, -10), Vec3(10, -2, -10), Vec3(10, 6, -10), Material(0, 1 / pi)
-        ),
-        Triangle(
-            Vec3(-10, -2, -10), Vec3(10, 6, -10), Vec3(-10, 6, -10), Material(0, 1 / pi)
-        ),
-        Triangle(
-            Vec3(-10, -2, -10), Vec3(-10, 6, 10), Vec3(-10, -2, 10), Material(0, 1 / pi)
-        ),
-        Triangle(
-            Vec3(-10, -2, -10), Vec3(-10, 6, -10), Vec3(-10, 6, 10), Material(0, 1 / pi)
-        ),
-        Triangle(
-            Vec3(10, -2, -10), Vec3(10, -2, 10), Vec3(10, 6, 10), Material(0, 1 / pi)
-        ),
-        Triangle(
-            Vec3(10, -2, -10), Vec3(10, 6, 10), Vec3(10, 6, -10), Material(0, 1 / pi)
-        ),
-        Triangle(
-            Vec3(-10, -2, 10), Vec3(10, 6, 10), Vec3(10, -2, 10), Material(0, 1 / pi)
-        ),
-        Triangle(
-            Vec3(-10, -2, 10), Vec3(-10, 6, 10), Vec3(10, 6, 10), Material(0, 1 / pi)
-        ),
+        Triangle(Vec3(-10, -2, -10), Vec3(10, -2, 10), Vec3(10, -2, -10), mat),
+        Triangle(Vec3(-10, -2, -10), Vec3(-10, -2, 10), Vec3(10, -2, 10), mat),
+        Triangle(Vec3(-10, 6, -10), Vec3(10, 6, -10), Vec3(10, 6, 10), mat),
+        Triangle(Vec3(-10, 6, -10), Vec3(10, 6, 10), Vec3(-10, 6, 10), mat),
+        Triangle(Vec3(-10, -2, -10), Vec3(10, -2, -10), Vec3(10, 6, -10), mat),
+        Triangle(Vec3(-10, -2, -10), Vec3(10, 6, -10), Vec3(-10, 6, -10), mat),
+        Triangle(Vec3(-10, -2, -10), Vec3(-10, 6, 10), Vec3(-10, -2, 10), mat),
+        Triangle(Vec3(-10, -2, -10), Vec3(-10, 6, -10), Vec3(-10, 6, 10), mat),
+        Triangle(Vec3(10, -2, -10), Vec3(10, -2, 10), Vec3(10, 6, 10), mat),
+        Triangle(Vec3(10, -2, -10), Vec3(10, 6, 10), Vec3(10, 6, -10), mat),
+        Triangle(Vec3(-10, -2, 10), Vec3(10, 6, 10), Vec3(10, -2, 10), mat),
+        Triangle(Vec3(-10, -2, 10), Vec3(-10, 6, 10), Vec3(10, 6, 10), mat),
     )
 
     ptracer = PathTracer()
