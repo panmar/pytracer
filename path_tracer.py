@@ -247,7 +247,7 @@ class PathTracer:
         img = [[0 for x in range(camera.resolution[0])] for x in range(camera.resolution[1])]
         random.seed(datetime.now())
 
-        def args_generator():
+        def args_provider():
             nonlocal samples, camera, scene
             for j in range(camera.resolution[1]):
                 for i in range(camera.resolution[0]):
@@ -258,7 +258,7 @@ class PathTracer:
         process_count = 4;
         with Pool(processes=process_count) as pool:
             colors = pool.imap(path_trace_from_tuple,
-                               args_generator(),
+                               args_provider(),
                                samples * camera.resolution[0])
             for j in range(camera.resolution[1]):
                 for i in range(camera.resolution[0]):
