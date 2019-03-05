@@ -196,9 +196,6 @@ inline Vec3 random_unit_vec_in_hemisphere(const Vec3& normal) {
 
 using Object = std::variant<Sphere, Triangle>;
 
-template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
-template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
-
 inline int path_trace(const Ray& ray,
                       int depth,
                       const vector<Object>& scene,
