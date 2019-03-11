@@ -1,8 +1,13 @@
 # pypathtracer
 A toy implementation of path-tracer.
 
+<img src="example.png" alt="example" width="400"/>
+
 Example use:
 ```python
+    from math import pi
+    from path_tracer import Camera, Material, Sphere, Triangle, PathTracer, Vec3, save_img
+
     camera = Camera(
         position=Vec3(0, 2, 8.5),
         target=Vec3(0, 0, 0),
@@ -19,6 +24,6 @@ Example use:
     )
 
     ptracer = PathTracer()
-    img = ptracer.render(camera, scene, 32)
+    img = ptracer.render(camera, scene, samples=32)
     save_img("image.ppm", img)
 ```
