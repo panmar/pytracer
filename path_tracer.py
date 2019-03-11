@@ -65,7 +65,7 @@ class Material:
 class Sphere:
     center: Vec3
     radius: float
-    material: Material
+    material: Material = Material()
 
 
 @dataclass
