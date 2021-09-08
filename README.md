@@ -1,4 +1,4 @@
-# pypathtracer
+# pytracer
 A toy implementation of path-tracer.
 
 <img src="example.png" alt="example" width="400"/>
