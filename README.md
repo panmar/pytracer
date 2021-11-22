@@ -1,7 +1,7 @@
 # pytracer
 A toy implementation of path-tracer.
 
-<img src="example.png" alt="example" width="400"/>
+<p align="center"><img src="example.png" alt="example" width="400"/></p>
 
 Example use:
 ```python
