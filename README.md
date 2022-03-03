@@ -3,7 +3,7 @@ A toy implementation of path-tracer.
 
 <p align="center"><img src="example.png" alt="example" width="400"/></p>
 
-Example use:
+## Example
 ```python
     from math import pi
     from path_tracer import Camera, Material, Sphere, Triangle, PathTracer, Vec3, save_img
